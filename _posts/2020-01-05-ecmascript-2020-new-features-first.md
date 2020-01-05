@@ -15,7 +15,7 @@ ecmascript는 2015년 이후 매년 새로운 기능을 추가해서 버전을 �
 
 [캡쳐 그룹](https://javascript.info/regexp-groups "캡쳐 그룹")
 
-* 문법
+* 문법w
 ```javascript
 str.matchAll(regexp) //결과 값으로 iterator가 반환
 ```
@@ -39,11 +39,11 @@ const regex = /"(.+?)"/g;
 console.log(str.match(regex)); //[""javacafe"", ""만만세""]
 ```
 
-위에서 저희가 원하는 경우는 ""안에 있는 Text를 반환하는 것이 었는데, match를 사용하면 ""를 포함한 값을 가져오게 됩니다. 그럼 이 Text를 가지고 ""를 지우는 로직을 추가해서 처리하면 되긴 한데,먼가 좀 더 효율적인 방법이 없나 찾아보게됩니다. 이것보다 좀 더 효율적인 방법은 캡처 그룹을 활용하는 방법입니다. 갭처 그룹에 대해서는 위에 링크를 걸어놨으니 한번 보시고 오시면 도움이 될 것 같습니다. 하지만 정규표현식에 g 옵션을 주고 사용할 경우 match 메서드를 사용하면 매칭되는 text의 배열만 결과 값으로 나오게 되어 캡쳐 그룹을 활용할 수 없게 됩니다. 그럼 캡쳐 그룹을 활용할 수 있는 방법에 대해서 한번 알아보도록 하겠습니다.
+위에서 저희가 원하는 경우는 ""안에 있는 Text를 반환하는 것이 었는데, match를 사용하면 ""를 포함한 값을 가져오게 됩니다. 이 가져온 결과를 map, replace 등의 함수를 통해서 ""를 제거하고 새로운 배열을 생성하면 되지만 이것보다 좀 더 효율적인 방법을 생각해보겠습니다. 이것보다 좀 더 효율적인 방법은 캡처 그룹을 활용하는 방법입니다.(캡처 그룹에 대해서는 위에 링크를 걸어놨으니 한번 보시고 오시면 도움이 될 것 같습니다.) 하지만 정규표현식에 g 옵션을 주고 사용할 경우 match 메서드를 사용하면 매칭되는 text의 배열만 결과 값으로 나오게 되어 캡쳐 그룹을 활용할 수 없게 됩니다. 캡쳐 그룹을 활용할 수 있는 방법은 무엇이 있을까요? 우선 RegExp.prototype.exec 메소드를 사용하는 방법을 통해서 알아보겠습니다.
 
 ### RegExp.prototype.exec
 
-이럴 경우는 RegExp.prototype.exec 메소드를 사용합니다. 해당 메소드에 대한 설명은 아래 링크를 참고하시기 바랍니다.
+해당 메소드에 대한 설명은 아래 링크를 참고하시기 바랍니다.
 
 [RegExp.prototype.exec](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
 
@@ -60,11 +60,11 @@ while(match = regex.exec(str)) {
 console.log(result); //["javacafe", "만만세"]
 ```
 
-위와 같이 할 경우 우리가 원하는 결과를 받을 수 있습니다. 하지만 위 프로그램의 경우 문제가 발생할 수 있습니다. 어떤 경우이냐 하면 정규표현식에 g 옵션을 뺄 경우 exec의 경우 항상 처음 매칭되는 값을 가져오기 때문에, 해당 로직은 무한루프에 빠져들게 됩니다. 이는 심각한 문제를 만들 수 있기 때문에 이것을 피하기 위해서 아래와 같은 방법을 사용할 수 있습니다.
+위와 같이 할 경우 우리가 원하는 결과를 받을 수 있습니다. 하지만 위 프로그램의 경우 문제가 발생할 수 있습니다. 정규표현식에 g 옵션을 뺄 경우 exec의 경우 항상 처음 매칭되는 값을 가져오기 때문에, 해당 로직은 무한루프에 빠져들게 됩니다. 그럼 항상 정규표현식을 작성할 때 g 옵션을 넣었는지 안넣었는지 확인을 해봐야 하는 것입니다. 프로그램을 작성하는 것은 사람인지라 실수를 할 수 있는데 이 실수는 정말 큰 문제를 만들 수 있습니다. 그럼 이것보다 안전한 방법은 무엇이 있을까요? String.prototype.replace를 활용하는 방법이 있습니다.
 
 ### String.prototype.replace
 
-String.prototype.replace를 활용하면 위와 같은 기능을 구현 할 수 있습니다. 관련 설명은 아래 링크를 참고하시기 바랍니다.
+해당 메소드에 대한 설명은 아래 링크를 참고하시기 바랍니다.
 
 [String.prototype.replace](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
 
@@ -76,12 +76,12 @@ let match;
 
 str.replace(regex, function(match, p1) {
   result.push(p1);
-})
+});
 
 console.log(result); //["javacafe", "만만세"]
 ```
 replace의 경우 2번 째 파라미터에 함수를 넘길 경우 함수 파라미터로 캡쳐 그룹 데이터를 받을 수 있습니다. 이것을 활용해서 구현하는 방법입니다.
-이럴 경우 g 옵션을 실수도 빼먹었다고 하더라도 무한루프에 빠지지는 않게됩니다. 하지만 여기서 고려해봐야 할 것이 replace 함수를 활용입니다. replace 함수의 역할은 원래 무엇인가를 바꾸는 것인데 지금 사용한 것은 정규표현식과 매칭되는 데이터를 가져오는 역할을 하고 있습니다. 이는 해당 함수가 잘못된 역할로 사용되었다고 볼 수 있고, 이 함수를 보고 어떤 역할을 하는지 파악하기 어렵게 됩니다. 이런 문제를 피하기 위해서 matchAll이 나오게 되었습니다.
+이럴 경우 g 옵션을 실수도 빼먹었다고 하더라도 무한루프에 빠지지는 않게됩니다. 하지만 replace를 활용하는 것도 먼가가 이상합니다. replace 함수의 역할은 원래 무엇인가를 바꾸는 것인데 지금 사용한 것은 정규표현식과 매칭되는 데이터를 가져오는 역할을 하고 있습니다. 이는 해당 함수가 잘못된 역할로 사용되었다고 볼 수 있고 이 함수를 보고 어떤 역할을 하는지 파악하기 어렵게 됩니다. 이런 문제들(g 옵션 여부에 따른 문제, 직관성 문제등)을 개선하기 위해서 만든 함수가 String.prototype.matchAll 입니다.
 
 ### String.prototype.matchAll
 
@@ -101,6 +101,8 @@ String.prototype.matchAll를 활용하면 위와 같은 작성할 수 있습니�
 
 위 예제를 보시면 알겠지만, 위에 있는 다른 메소드들과 다르게 matchAll 의 결과 값은 배열이 아니고 iterator 입니다. iterator를 활용함으로써 보다 큰 캡처 그룹일 가지고 있거나 큰 사이즈의 문자열에 좀 효율적으로 사용할 수 있게 되었고, 만약 배열의 데이터가 필요한 경우에는 Arrray.from 또는 스프레드 연산자([...str.matchAll(regex)])를 활용해서 만들어서 사용하시면 됩니다.
 
+## 정규표현식의 lastIndex
+
 matchAll의 경우는 정규표현식을 내부적으로 복사해서 사용합니다. 그래서 string 스캔 후에도 기존 정규표현식의 lastIndex가 변경되지 않습니다. 정규표현식의 lastIndex에 대한 설명은 아래 링크를 참고해주시기 바랍니다.
 
 [regexp.lastIndex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/lastIndex)
@@ -110,10 +112,16 @@ const regexp = RegExp('[a-c]','g');
 regexp.lastIndex = 1;
 const str = 'abc';
 
-Array.from(str.matchAll(regexp), m => `${regexp.lastIndex} ${m[0]}`);
-// Array [ "1 b", "1 c" ]
 str.match(regexp);
 console.log(regexp.lastIndex);  //0 이미 다 검색을 했기 때문에 lastIndex가 0으로 변경된다.
+
+const regexp = RegExp('[a-c]','g');
+regexp.lastIndex = 1;
+const str = 'abc';
+
+Array.from(str.matchAll(regexp), m => `${regexp.lastIndex} ${m[0]}`);
+// Array [ "1 b", "1 c" ]
+// 기존 정규표현식에는 영향을 주지 않는다.
 ```
 
 이상으로 String.prototype.matchAll에 대해서 알아봤습니다. 다음에는 다른 새로운 특징에 대해서 한번 더 알아보겠습니다.
